@@ -3,6 +3,8 @@
 from __future__ import print_function
 from random import seed, randint
 import logging
+import re
+import sys
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
@@ -11,7 +13,11 @@ LOGGER.setLevel(logging.DEBUG)
 class TradeCargo(object):
     '''Simple approach'''
     def __init__(self):
-        self.codes = {
+        self.tech_level = 0
+        self.trade_codes = []
+        self.cost = 0
+        self.description = ''
+        self._codes = {
             'Ga': [
                 ['Bulk Protein', 'Bulk Carbs', 'Bulk Fats',
                  'Bulk Pharma', 'Livestock', 'Seedstock'],
@@ -163,9 +169,24 @@ class TradeCargo(object):
                 ['Regulations', 'Synchronzations', 'Expert Systems',
                  'Educationals', 'Mandates', 'Accountings']]
         }
+        self._match_uwp = re.compile(r'[A-HX][0-9A-Z]{6}\-([0-9A-Z])')
         seed()
 
-    def select_cargo(self, trade_codes, add_detail_flag=True):
+    def generate_cargo(self, uwp, trade_codes=None):
+        '''Generate cargo based on UWP, TCs'''
+
+        # Extract TL from UWP
+        self.cost = 3000
+        LOGGER.debug('Cost = %s', self.cost)
+        self.get_tl(uwp)
+        # Get useful trade codes
+        if isinstance(trade_codes, list):
+            self.process_trade_codes(trade_codes)
+        else:
+            self.trade_codes = list()
+        self.description = self.select_cargo_name(self.trade_codes)
+
+    def select_cargo_name(self, trade_codes, add_detail_flag=True):
         '''Select cargo based on [trade_codes]'''
         # Pick trade code at random
         LOGGER.debug('Supplied trade codes = %s', trade_codes)
@@ -179,7 +200,7 @@ class TradeCargo(object):
             LOGGER.debug('Trade code is %s', trade_code)
 
         # Validate trade code -- use Na if it's not in the list
-        if trade_code not in self.codes:
+        if trade_code not in self._codes:
             LOGGER.debug(
                 '%s not in supported trade codes, using Na instead',
                 trade_code)
@@ -187,7 +208,7 @@ class TradeCargo(object):
 
         # Pick cargo at random
         LOGGER.debug('Picking cargo description for %s', trade_code)
-        cargo = self.codes[trade_code][randint(0, 5)][randint(0, 5)]
+        cargo = self._codes[trade_code][randint(0, 5)][randint(0, 5)]
         LOGGER.debug('Selected %s', cargo)
 
         # Deal with imbalance results (_Xx)
@@ -196,7 +217,7 @@ class TradeCargo(object):
             add_detail_flag = False
             code = cargo.replace('_', '')
             LOGGER.debug('Rerunning with imbalance')
-            cargo = self.select_cargo([code])
+            cargo = self.select_cargo_name([code])
 
         # Classification-specific prefix
         prefix = None
@@ -239,3 +260,63 @@ class TradeCargo(object):
             return descriptions[randint(0, len(descriptions) - 1)]
         else:
             return None
+
+    def get_tl(self, uwp):
+        '''Extract TL from UWP, store in self.tech_level'''
+        try:
+            self.tech_level = self._match_uwp.match(uwp).group(1)
+        except AttributeError:
+            print('Invalid UWP {} (should be StSzAHPGL-T'.format(uwp))
+            sys.exit(1)
+
+        # All good, proceed
+        LOGGER.debug(
+            'TL = %s (%s)',
+            self.tech_level,
+            self._tech_level_as_int(self.tech_level))
+        self.cost += 100 * self._tech_level_as_int(self.tech_level)
+        LOGGER.debug(
+            'Cost TL mod = %s',
+            100 * self._tech_level_as_int(self.tech_level))
+        LOGGER.debug('Cost = %s', self.cost)
+
+    def process_trade_codes(self, trade_codes):
+        ''' Process trade codes - add valid TCs to self.trade_codes'''
+        cost_mods = {
+            'Ag': -1000, 'As': -1000, 'Ba': +1000, 'De': +1000,
+            'Fl': +1000, 'Hi': -1000, 'Ic': 0, 'In': -1000,
+            'Lo': +1000, 'Na': 0, 'Ni': +1000, 'Po': -1000,
+            'Ri': +1000, 'Va': +1000
+        }
+        valid_trade_codes = []
+        for trade_code in trade_codes:
+            if trade_code in cost_mods.keys():
+                LOGGER.debug('Adding trade code %s', trade_code)
+                valid_trade_codes.append(trade_code)
+            else:
+                LOGGER.debug('Ignoring trade code %s', trade_code)
+        self.trade_codes = list(set(valid_trade_codes))
+
+        # Add cost modifiers
+        for trade_code in self.trade_codes:
+            LOGGER.debug(
+                'Processing trade code %s (cost mod = Cr %s)',
+                trade_code,
+                cost_mods[trade_code])
+            self.cost += cost_mods[trade_code]
+
+    @staticmethod
+    def _tech_level_as_int(tech_level):
+        '''Return int representation of tech_level'''
+        if tech_level in '0123456789':
+            return int(tech_level)
+        else:
+            return ord(tech_level) - 55
+
+    def __repr__(self):
+        '''Represent cargo'''
+        return '{}-{} Cr{:,} {}'.format(
+            self.tech_level,
+            ' '.join(self.trade_codes),
+            self.cost,
+            self.description)
