@@ -4,6 +4,7 @@ from __future__ import print_function
 from random import seed, randint
 import logging
 import re
+import json
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
@@ -362,6 +363,32 @@ class TradeCargo(object):
             self.description,
             self.price)
 
+    def json_export(self):
+        '''Export JSON'''
+        jdata = {
+            'tech_level': self.tech_level,
+            'trade_codes': self.trade_codes,
+            'description': self.description,
+            'cost': self.cost,
+            'price': 0
+        }
+        return json.dumps(jdata)
+
+    def json_import(self, jdata):
+        '''Import JSON'''
+        try:
+            jdict = json.loads(jdata)
+        except ValueError:
+            raise
+        try:
+            self.tech_level = jdict['tech_level']
+            self.trade_codes = jdict['trade_codes']
+            self.description = jdict['description']
+            self.cost = jdict['cost']
+            self.price = 0
+        except KeyError:
+            raise
+
 
 class BrokerSale(object):
     '''Broker-assisted sale'''
@@ -404,3 +431,27 @@ class BrokerSale(object):
             self.cargo,
             self.actual_value,
             self.commission)
+
+    def json_export(self):
+        '''Export Json'''
+        jdict = {
+            'cargo': self.cargo.json_export(),
+            'skill': self.skill,
+            'actual_value': self.actual_value,
+            'commission': self.commission
+        }
+        return json.dumps(jdict)
+
+    def json_import(self, jdata):
+        '''JSON import'''
+        try:
+            jdict = json.loads(jdata)
+        except ValueError:
+            raise
+        try:
+            self.skill = jdict['skill']
+            self.actual_value = jdict['actual_value']
+            self.commission = jdict['commission']
+            self.cargo.json_import(jdict['cargo'])
+        except KeyError:
+            raise
