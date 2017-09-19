@@ -49,13 +49,20 @@ def index():
     '''Generate cargo'''
     cargo = TradeCargo()
     form = SourceWorldForm()
+    source_world_uwp = ''
+    source_world_tcs = ''
+    market_world_uwp = ''
+    market_world_tcs = ''
     if form.validate_on_submit():
         LOGGER.debug('form.source_uwp.data = %s', form.source_uwp.data)
         # form.uwp.data is unicode, convert
-        source_world = World(str(form.source_uwp.data))
-        cargo.generate_cargo(
-            str(source_world.uwp),
-            source_world.trade_codes.list())
+        if form.source_uwp.data:
+            source_world = World(str(form.source_uwp.data))
+            cargo.generate_cargo(
+                str(source_world.uwp),
+                source_world.trade_codes.list())
+            source_world_uwp = str(source_world.uwp)
+            source_world_tcs = str(source_world.trade_codes)
         if form.market_uwp.data:
             market_world = World(str(form.market_uwp.data))
             cargo.generate_sale(
@@ -63,15 +70,12 @@ def index():
                 market_world.trade_codes.list())
             market_world_uwp = str(market_world.uwp)
             market_world_tcs = str(market_world.trade_codes)
-        else:
-            market_world_uwp = ''
-            market_world_tcs = ''
 
     return render_template(
         'index.html',
         cargo=cargo,
-        source_world_uwp=str(source_world.uwp),
-        source_world_tcs=str(source_world.trade_codes),
+        source_world_uwp=source_world_uwp,
+        source_world_tcs=source_world_tcs,
         market_world_uwp=market_world_uwp,
         market_world_tcs=market_world_tcs,
         form=form)
