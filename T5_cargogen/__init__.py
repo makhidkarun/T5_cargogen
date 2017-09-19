@@ -1,5 +1,5 @@
 '''
-Cargo for Traveller 5
+T5 cargo generator
 '''
 
 import logging
