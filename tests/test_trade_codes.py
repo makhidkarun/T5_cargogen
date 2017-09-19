@@ -47,6 +47,13 @@ class TestTradeCodes(unittest.TestCase):
         self.assertTrue('Ni' in tcs.list())
         self.assertTrue('Pa' in tcs.list())
 
+    def test_str(self):
+        '''Test TradeCodes str()'''
+        # TCs for B655404-A are [Ga Ni Pa]
+        tcs = TradeCodes(Uwp('B655404-A'))
+        self.assertIsInstance(str(tcs), str)
+        self.assertTrue(str(tcs) == 'Ga Ni Pa')
+
 
 class TestTradeCodesPlanetary(unittest.TestCase):
     '''Test planetary trade codes'''

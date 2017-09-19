@@ -30,7 +30,21 @@
     </div>
     <div class="body">
         {{ wtf.quick_form(form) }}
-        <h3>Cargo</h3>
+        <h3>Planet details</h3>
+        <table style="width:50%">
+            <tr>
+                <th>Planet</th><th>UWP</th><th>Trade codes</th>
+            </tr>
+            <tr>
+                <td>Source</td>
+                <td>{{ source_world_uwp }}</td>
+                <td>{{ source_world_tcs }}</td>
+            </tr>
+            <tr>
+                <td>Market</td>
+                <td>{{ market_world_uwp }}</td>
+                <td>{{ market_world_tcs }}</td>
+        </table>
         <pre>
 {{ cargo }}
         </pre>

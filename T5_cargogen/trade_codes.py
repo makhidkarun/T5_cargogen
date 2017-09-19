@@ -229,3 +229,7 @@ class TradeCodes(object):
     def list(self):
         '''repr'''
         return self.trade_codes
+
+    def __str__(self):
+        '''str'''
+        return ' '.join(self.trade_codes)

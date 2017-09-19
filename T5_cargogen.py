@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_script import Manager
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField
-from wtforms.validators import Regexp
+from wtforms.validators import Regexp, Optional
 
 from T5_cargogen.simple import TradeCargo
 from T5_cargogen.trade_codes import TradeCodes, Uwp
@@ -33,9 +33,14 @@ class World(object):
 
 class SourceWorldForm(Form):
     '''Source world'''
-    uwp = StringField(
+    source_uwp = StringField(
         'Source world UWP',
         validators=[Regexp(r'^[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]$')])
+    market_uwp = StringField(
+        'Market world UWP',
+        validators=[
+            Optional(),
+            Regexp(r'^[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]$')])
     submit = SubmitField('Submit')
 
 
@@ -43,16 +48,33 @@ class SourceWorldForm(Form):
 def index():
     '''Generate cargo'''
     cargo = TradeCargo()
-    form=SourceWorldForm()
+    form = SourceWorldForm()
     if form.validate_on_submit():
-        LOGGER.debug('form validated')
-        LOGGER.debug('form.uwp.data type is %s', type(form.uwp.data))
-        LOGGER.debug('form.uwp.data = %s', form.uwp.data)
+        LOGGER.debug('form.source_uwp.data = %s', form.source_uwp.data)
         # form.uwp.data is unicode, convert
-        world = World(str(form.uwp.data))
-        cargo.generate_cargo(str(world.uwp), world.trade_codes.list())
+        source_world = World(str(form.source_uwp.data))
+        cargo.generate_cargo(
+            str(source_world.uwp),
+            source_world.trade_codes.list())
+        if form.market_uwp.data:
+            market_world = World(str(form.market_uwp.data))
+            cargo.generate_sale(
+                str(market_world.uwp),
+                market_world.trade_codes.list())
+            market_world_uwp = str(market_world.uwp)
+            market_world_tcs = str(market_world.trade_codes)
+        else:
+            market_world_uwp = ''
+            market_world_tcs = ''
 
-    return render_template('index.html', cargo=cargo, form=form)
+    return render_template(
+        'index.html',
+        cargo=cargo,
+        source_world_uwp=str(source_world.uwp),
+        source_world_tcs=str(source_world.trade_codes),
+        market_world_uwp=market_world_uwp,
+        market_world_tcs=market_world_tcs,
+        form=form)
 
 
 if __name__ == '__main__':

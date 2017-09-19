@@ -201,6 +201,7 @@ class TradeCargo(object):
         tl_mod = 0.1 * (
             self._tech_level_as_int(self.tech_level) -
             self._tech_level_as_int(market_tech_level))
+        LOGGER.debug('Price TL modifier = %s%%', int(100 * tl_mod))
         self.price = int(self.price * (1 + tl_mod))
         LOGGER.debug('Price = %s', self.price)
 
@@ -245,7 +246,7 @@ class TradeCargo(object):
             'Va': (['As', 'In', 'Va'], 1000)
         }
         for trade_code in self.trade_codes:
-            if trade_code in market_mods:
+            if trade_code in market_mods.keys():
                 for code in market_mods[trade_code][0]:
                     LOGGER.debug(
                         'Checking source TC %s market TC %s',
