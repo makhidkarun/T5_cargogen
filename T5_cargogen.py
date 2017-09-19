@@ -19,6 +19,7 @@ APP = Flask(__name__)
 APP.config['SECRET_KEY'] = 'baiNgeeB2ciNai7naeyaich0u'
 BOOTSTRAP = Bootstrap(APP)
 MANAGER = Manager(APP)
+UWP_REGEXP = r'(?:[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z])'
 
 
 class World(object):
@@ -35,12 +36,12 @@ class SourceWorldForm(Form):
     '''Source world'''
     source_uwp = StringField(
         'Source world UWP',
-        validators=[Regexp(r'^[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]$')])
+        validators=[Regexp(UWP_REGEXP)])
     market_uwp = StringField(
         'Market world UWP',
         validators=[
             Optional(),
-            Regexp(r'^[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]$')])
+            Regexp(UWP_REGEXP)])
     submit = SubmitField('Submit')
 
 
@@ -51,8 +52,7 @@ def index():
     form = SourceWorldForm()
     source_world_uwp = ''
     source_world_tcs = ''
-    market_world_uwp = ''
-    market_world_tcs = ''
+    results = list()
     if form.validate_on_submit():
         LOGGER.debug('form.source_uwp.data = %s', form.source_uwp.data)
         # form.uwp.data is unicode, convert
@@ -64,20 +64,24 @@ def index():
             source_world_uwp = str(source_world.uwp)
             source_world_tcs = str(source_world.trade_codes)
         if form.market_uwp.data:
-            market_world = World(str(form.market_uwp.data))
-            cargo.generate_sale(
-                str(market_world.uwp),
-                market_world.trade_codes.list())
-            market_world_uwp = str(market_world.uwp)
-            market_world_tcs = str(market_world.trade_codes)
+            LOGGER.debug('form.market_uwp.data = %s', form.market_uwp.data)
+            for uwp in form.market_uwp.data.replace(' ', '').split(','):
+                LOGGER.debug('uwp = %s', uwp)
+                market_world = World(str(uwp))
+                cargo.generate_sale(
+                    str(market_world.uwp),
+                    market_world.trade_codes.list())
+                results.append([
+                    str(market_world.uwp),
+                    str(market_world.trade_codes), cargo.str_price()])
 
+    LOGGER.debug('results = %s', results)
     return render_template(
         'index.html',
         cargo=cargo,
         source_world_uwp=source_world_uwp,
         source_world_tcs=source_world_tcs,
-        market_world_uwp=market_world_uwp,
-        market_world_tcs=market_world_tcs,
+        results=results,
         form=form)
 
 

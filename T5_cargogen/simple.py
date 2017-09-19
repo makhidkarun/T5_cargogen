@@ -390,6 +390,27 @@ class TradeCargo(object):
         except KeyError:
             raise
 
+    def str_cost(self):
+        '''Show cost'''
+        return '{}-{} Cr{:,} {}'.format(
+            self.tech_level,
+            ' '.join(self.trade_codes),
+            self.cost,
+            self.description)
+
+    def __str__(self):
+        '''Str representation'''
+        return '{}-{} Cr{:,} {}\nSale price: Cr{:,}'.format(
+            self.tech_level,
+            ' '.join(self.trade_codes),
+            self.cost,
+            self.description,
+            self.price)
+
+    def str_price(self):
+        '''Show price'''
+        return 'Sale price: Cr{:,}'.format(self.price)
+
 
 class BrokerSale(object):
     '''Broker-assisted sale'''
