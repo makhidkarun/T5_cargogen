@@ -19,7 +19,8 @@ APP = Flask(__name__)
 APP.config['SECRET_KEY'] = 'baiNgeeB2ciNai7naeyaich0u'
 BOOTSTRAP = Bootstrap(APP)
 MANAGER = Manager(APP)
-UWP_REGEXP = r'(?:[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z])'
+UWP_REGEXP = r'^[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]$'
+UWPS_REGEXP = r'(?:[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z])'
 
 
 class World(object):
@@ -41,7 +42,7 @@ class SourceWorldForm(Form):
         'Market world UWP',
         validators=[
             Optional(),
-            Regexp(UWP_REGEXP)])
+            Regexp(UWPS_REGEXP)])
     submit = SubmitField('Submit')
 
 
