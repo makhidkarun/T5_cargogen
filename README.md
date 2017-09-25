@@ -38,7 +38,7 @@ $ python ./manage.py runserver
 ### Generate cargoes
 Point a browser at localhost:5000 and enter a valid UWP in the *Source world UWP* box; under *Planet details* you will see your UWP, its relevant trade codes and the cargo, with label, description and cost/ton.
 
-![Screenshot][https://github.com/egor045/image_bank/raw/master/T5_cargogen-screenshot.png]
+![screenshot](https://github.com/egor045/image_bank/raw/master/T5_cargogen-screenshot.png)
 
 Add one or more UWPs (space- or comma-separated) to the *Market world UWP* box; under *Planet details* you will see the source world cargo as before, as well as a line for each market world listing its UWP, trade codes and the base sale price - the price that will be adjusted by an actual value Flux roll (see T5 rules, page 487).
  
