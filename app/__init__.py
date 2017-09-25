@@ -18,6 +18,7 @@ bootstrap = Bootstrap()
 
 def create_app(config_name):
     '''Create app'''
+    LOGGER.debug('Setting up app %s', __name__)
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)

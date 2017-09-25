@@ -24,7 +24,7 @@ logging.basicConfig(
 class TestTradeCargo(unittest.TestCase):
     '''Test trade good class'''
     def test_trade_codes(self):
-        '''Test trade codes reduction for Efate'''
+        '''Test TradeCargo trade codes reduction for Efate'''
         uwp = 'A646930-D'
         trade_codes = ['Hi', 'In', 'An']
         cargo = TradeCargo()
@@ -32,16 +32,24 @@ class TestTradeCargo(unittest.TestCase):
         self.assertTrue(cargo.trade_codes == ['Hi', 'In'])
 
     def test_purchase(self):
-        '''Test purchase on Efate'''
+        '''Test TradeCargo purchase on Efate'''
         cargo = TradeCargo()
-        # Test with Efat data
+        # Test with Efate data
         uwp = 'A646930-D'
         trade_codes = ['Hi', 'In', 'An']
         cargo.generate_cargo(uwp, trade_codes)
         self.assertTrue(cargo.cost == 2300)
 
+    def test_purchase_no_trade_codes(self):
+        '''Test TradeCargo purchase, market trade codes == []'''
+        cargo = TradeCargo()
+        cargo.generate_cargo('A646930-D', ['Hi', 'In', 'An'])
+        # Market world = 'D257478-0'
+        cargo.generate_sale('D257478-0')
+        self.assertTrue(cargo.price == 11500)
+
     def test_sale(self):
-        '''Test purchase of Efate cargo on Alell'''
+        '''Test TradeCargo purchase of Efate cargo on Alell'''
         cargo = TradeCargo()
         source_uwp = 'A646930-D'
         source_trade_codes = ['Hi', 'In', 'An']
@@ -88,6 +96,64 @@ class TestTradeCargo(unittest.TestCase):
         self.assertTrue(cargo1.trade_codes == cargo2.trade_codes)
         self.assertTrue(cargo1.cost == cargo2.cost)
         self.assertTrue(cargo1.description == cargo2.description)
+
+    def test_empty_trade_codes(self):
+        '''Test TradeCargo trade_codes == []'''
+        cargo = TradeCargo()
+        source_uwp = 'D247868-6'
+        source_trade_codes = []
+        cargo.generate_cargo(source_uwp, source_trade_codes)
+        self.assertTrue(cargo.cost == 3600)
+
+    def test_no_trade_codes(self):
+        '''Test TradeCargo trade_codes = None'''
+        cargo = TradeCargo()
+        source_uwp = 'D247868-6'
+        cargo.generate_cargo(source_uwp)
+        self.assertTrue(cargo.cost == 3600)
+
+    def test_bad_uwp_get_tl(self):
+        '''Test TradeCargo get_tl() with invalid UWP'''
+        cargo = TradeCargo()
+        bad_uwp = 'P999ZZZ'
+        with self.assertRaises(AttributeError):
+            cargo.get_tl(bad_uwp)
+
+    def test_str_cost(self):
+        '''Test TradeCargo.str_cost()'''
+        cargo = TradeCargo()
+        cargo.cost = 4600
+        cargo.tech_level = '6'
+        cargo.description = 'Cryo Exotic Flora'
+        cargo.trade_codes = ['Ni']
+        self.assertTrue(cargo.str_cost() == '6-Ni Cr4,600 Cryo Exotic Flora')
+
+    def test_str_cost_blank(self):
+        '''Test TradeCargo.str_cost() blank data'''
+        cargo = TradeCargo()
+        cargo.cost = 0
+        cargo.tech_level = 0
+        cargo.description = ''
+        self.assertTrue(cargo.str_cost() == '')
+
+    def test_str_price(self):
+        '''Test TradeCargo.str_price()'''
+        cargo = TradeCargo()
+        cargo.price = 3000
+        self.assertTrue(cargo.str_price() == 'Sale price: Cr3,000')
+
+    def test_sale_price_lt_zero(self):
+        '''Test TradeCargo sale price < 0'''
+        cargo = TradeCargo()
+        # Cost should be 4000
+        cargo.generate_cargo(
+            'D257478-0',
+            ['Ni', 'Pa'])
+        # Price should be -2000 -> 0
+        cargo.generate_sale(
+            'A000989-D',
+            ['As', 'Va', 'Hi', 'Na', 'In'])
+        self.assertTrue(cargo.price == 0)
 
 
 class TestBroker(unittest.TestCase):
