@@ -354,7 +354,7 @@ class TradeCargo(object):
                 self._tech_level_as_int(tech_level))
             return tech_level
         except AttributeError:
-            print('Invalid UWP {} (should be StSzAHPGL-T'.format(uwp))
+            print('Invalid UWP {} (should be StSzAHPGL-T)'.format(uwp))
             raise
 
     @staticmethod
