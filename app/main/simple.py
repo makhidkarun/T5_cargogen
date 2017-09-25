@@ -195,6 +195,8 @@ class TradeCargo(object):
         # Get market trade codes
         if market_trade_codes is None:
             market_trade_codes = list()
+        if market_trade_codes == []:
+            market_trade_codes = ['Na']
         self.determine_price(market_trade_codes)
 
         # TL effect
@@ -203,6 +205,9 @@ class TradeCargo(object):
             self._tech_level_as_int(market_tech_level))
         LOGGER.debug('Price TL modifier = %s%%', int(100 * tl_mod))
         self.price = int(self.price * (1 + tl_mod))
+        if self.price < 0:
+            LOGGER.debug('Price (Cr%s) < Cr0, resetting to Cr0', self.price)
+            self.price = 0
         LOGGER.debug('Price = %s', self.price)
 
     def determine_cost(self, trade_codes):
@@ -213,6 +218,8 @@ class TradeCargo(object):
             'Lo': +1000, 'Na': 0, 'Ni': +1000, 'Po': -1000,
             'Ri': +1000, 'Va': +1000
         }
+        if trade_codes == []:
+            trade_codes = ['Na']
         valid_trade_codes = []
         for trade_code in trade_codes:
             if trade_code in cost_mods.keys():
@@ -263,6 +270,9 @@ class TradeCargo(object):
         '''Select cargo based on [trade_codes]'''
         # Pick trade code at random
         LOGGER.debug('Supplied trade codes = %s', trade_codes)
+        if trade_codes == []:
+            LOGGER.debug('No trade codes supplied, using Na')
+            trade_codes = ['Na']
         trade_code = trade_codes[randint(0, len(trade_codes) - 1)]
         LOGGER.debug('Selected trade code %s', trade_code)
 
@@ -392,20 +402,30 @@ class TradeCargo(object):
 
     def str_cost(self):
         '''Show cost'''
-        return '{}-{} Cr{:,} {}'.format(
-            self.tech_level,
-            ' '.join(self.trade_codes),
-            self.cost,
-            self.description)
+        if (self.tech_level == 0 and
+                self.cost == 0 and
+                self.description == ''):
+            return ''
+        else:
+            return '{}-{} Cr{:,} {}'.format(
+                self.tech_level,
+                ' '.join(self.trade_codes),
+                self.cost,
+                self.description)
 
     def __str__(self):
         '''Str representation'''
-        return '{}-{} Cr{:,} {}\nSale price: Cr{:,}'.format(
-            self.tech_level,
-            ' '.join(self.trade_codes),
-            self.cost,
-            self.description,
-            self.price)
+        if (self.tech_level == 0 and
+                self.cost == 0 and
+                self.description == ''):
+            return ''
+        else:
+            return '{}-{} Cr{:,} {}\nSale price: Cr{:,}'.format(
+                self.tech_level,
+                ' '.join(self.trade_codes),
+                self.cost,
+                self.description,
+                self.price)
 
     def str_price(self):
         '''Show price'''

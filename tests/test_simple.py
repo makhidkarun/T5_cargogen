@@ -1,7 +1,7 @@
 '''simple.py tests'''
 
 from __future__ import print_function
-from T5_cargogen.simple import TradeCargo, BrokerSale
+from app.main.simple import TradeCargo, BrokerSale
 import sys
 import logging
 import json
@@ -99,7 +99,7 @@ class TestBroker(unittest.TestCase):
             '''Roll, return -1'''
             return -1
 
-    @patch('T5_cargogen.simple.BrokerSale.flux', MockFlux.flux)
+    @patch('app.main.simple.BrokerSale.flux', MockFlux.flux)
     def test_broker_sale(self):
         '''Test sale with broker'''
         cargo = TradeCargo()

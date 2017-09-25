@@ -1,7 +1,7 @@
 '''test_trade_codes.py'''
 
 import unittest
-from T5_cargogen.trade_codes import Uwp, TradeCodes
+from app.main.trade_codes import Uwp, TradeCodes
 
 
 class TestUwp(unittest.TestCase):
