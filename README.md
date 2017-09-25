@@ -17,7 +17,7 @@ Check your OS for instructions; here are some examples:
 - Ubuntu: `apt install python-virtualenv`
 - CentOS: `sudo yum install python-virtualenv`
 - Windows: See http://www.tylerbutler.com/2012/05/how-to-install-python-pip-and-virtualenv-on-windows-with-powershell/
-- Mac: 'sudo easy_install virtualenv'
+- Mac: `sudo easy_install virtualenv`
 
 
 ### Retrieve the code
