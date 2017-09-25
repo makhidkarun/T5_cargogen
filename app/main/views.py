@@ -9,7 +9,7 @@ from .simple import TradeCargo
 from .trade_codes import TradeCodes, Uwp
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.ERROR)
 
 
 class World(object):

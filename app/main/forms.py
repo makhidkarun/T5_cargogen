@@ -7,7 +7,7 @@ from wtforms import StringField, SubmitField, ValidationError
 from wtforms.validators import Regexp, Optional
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.ERROR)
 
 UWP_REGEXP = r'^[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]$'
 UWPS_REGEXP = r'\b[A-HYX][0-9A-HJ-NP-Z]{6}\-[0-9A-HJ-NP-Z]\b'

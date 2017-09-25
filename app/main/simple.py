@@ -7,7 +7,7 @@ import re
 import json
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.ERROR)
 
 
 class TradeCargo(object):

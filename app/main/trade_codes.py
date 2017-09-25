@@ -4,7 +4,7 @@ import re
 import logging
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.ERROR)
 
 
 class Uwp(object):
