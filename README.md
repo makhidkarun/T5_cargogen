@@ -6,7 +6,8 @@ Python modules to produce speculative cargoes in Traveller 5.
 Current status:
 - T5_cargogen.app.simple.TradeCargo() handles generating, naming, cost and price for a cargo
 - T5_cargogen.app.simple.BrokerSale() hadnles broker interactions
-- There is a web UI using flask. See notes for setting this up locally.
+- There is a web UI using flask. See notes for setting this up locally. Alternatively,
+there is a copy in Heroku's app service at http://t5-cargogen.herokuapp.com/ Note that this uses Heroku's free tier, so you may encounter a short delay as the instance spins up (if it's already running, you should see it immediately).
 - It has been extensively tested using Python 2.7, testing with Python 3.5 is in progress
 
 
@@ -45,4 +46,3 @@ Add one or more UWPs (space- or comma-separated) to the *Market world UWP* box; 
 ## To do
 - Make Python packages
 - Generate actual value (based on market world and broker skill)
-- Host somewhere so you don't need to download the code
